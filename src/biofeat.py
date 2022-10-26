@@ -536,10 +536,11 @@ class FeatureExtraction:
 
     def make_output_df(self, bTest):
 
-        list_output = []
+        list_output      = []
         list_sOutputKeys = ['Tm1', 'Tm2', 'Tm2new', 'Tm3', 'Tm4', 'TmD', 'nGCcnt1', 'nGCcnt2', 'nGCcnt3',
                         'fGCcont1', 'fGCcont2', 'fGCcont3', 'MFE3', 'MFE4']
 
+        nIDCnt = 0
         for sPAMKey in self.dict_sSeqs:
 
             sAltKey, sAltNotation, sStrand, nPAM_Nick, nAltPosWin, sPAMSeq, sGuideSeq = sPAMKey.split(',')
@@ -583,7 +584,11 @@ class FeatureExtraction:
                                 nEditPos, self.nAltLen, RHA_len, self.type_sub, self.type_ins, self.type_del
                                 ] + [self.dict_sOutput[sPAMKey][sSeqKey][sKey] for sKey in list_sOutputKeys]
                 else:
-                    list_sOut = [self.input_id, sWTSeq74, sEDSeq74, 
+                    nIDCnt += 1
+                    sID       = '%s.%s' % (self.input_id, nIDCnt)
+                    sSpacer_for_MFE = 'G' + sGuideSeq[1:-3]
+
+                    list_sOut = [sID, sWTSeq74, sEDSeq74, sSpacer_for_MFE,
                                 # dict_seq['RTPBS_right4'], dict_seq['AfterRTT_left4'],
                                 len(sPBSSeq), len(sRTTSeq), len(sPBSSeq + sRTTSeq), nEditPos, self.nAltLen,
                                 RHA_len, self.type_sub, self.type_ins, self.type_del
@@ -593,7 +598,7 @@ class FeatureExtraction:
             
             # loop END: sSeqKey
 
-        hder_essen = ['ID', 'WT74_On', 'Edited74_On', 'PBSlen', 'RTlen', 'RT-PBSlen', 'Edit_pos', 'Edit_len', 'RHA_len',
+        hder_essen = ['ID', 'WT74_On', 'Edited74_On','gN19',  'PBSlen', 'RTlen', 'RT-PBSlen', 'Edit_pos', 'Edit_len', 'RHA_len',
                     'type_sub', 'type_ins', 'type_del','Tm1', 'Tm2', 'Tm2new', 'Tm3', 'Tm4', 'TmD',
                     'nGCcnt1', 'nGCcnt2', 'nGCcnt3', 'fGCcont1', 'fGCcont2', 'fGCcont3', 'MFE3', 'MFE4']
         hder_test  = ['PBSSeq', 'RTTSeq', 'sForTm1', 'sForTm2', 'sForTm2new', 'sForTm3_1', 'sForTm3_2',

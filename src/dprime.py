@@ -1,6 +1,6 @@
 # Data for normalization should be in models directory
 
-import os
+import os, sys
 import numpy as np
 import pandas as pd
 import torch
@@ -73,68 +73,56 @@ class GeneInteractionModel(nn.Module):
         return F.softplus(out)
 
 
-def calculate_deepprime_score(df_input, pe_system='PE2', cell_line='HEK293T'):
+def calculate_deepprime_score(sBase_DIR, df_input, pe_system='PE2'):
 
     os.environ['CUDA_VISIBLE_DEVICES']='0'
-    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    device     = 'cuda' if torch.cuda.is_available() else 'cpu'
 
-    dict_model_path = {'PE2': {
-                                'HEK293T': 'DeepPrime_var/PE2/293T_PE2_Conv',
-                                'HCT116': 'DeepPrime_var/PE2/HCT116_PE2_Opti',
-                                'MDA-MB-231': 'DeepPrime_var/PE2/MDA_PE2_Opti'
-                                },
+    model_dir  = '%s/models' % sBase_DIR
+    dict_model = {'PE2':                    'DeepPrime_base',
+                  'PE2_offtarget':          'DeepPrime_off',
+                  'NRCH_PE2':               'DeepPrime_var/DP_variant_293T_NRCH_PE2_Opti_220428',
+                  'PE2max':                 'DeepPrime_var/DP_variant_293T_PE2max_Opti_220428',
+                  'PE2_Conv':               'DeepPrime_var/DP_variant_293T_PE2_Conv_220428',
+                  'PE4max_Opti':            'DeepPrime_var/DP_variant_293T_PE4max_Opti_220728',
+                  'A549_PE4max_Opti':       'DeepPrime_var/DP_variant_A549_PE4max_Opti_220728',
+                  'DLD1_NRCHPE4max_Opti':   'DeepPrime_var/DP_variant_DLD1_NRCHPE4max_Opti_220728',
+                  'DLD1_PE4max_Opti':       'DeepPrime_var/DP_variant_DLD1_PE4max_Opti_220728',
+                  'HCT116_PE2_Opti':        'DeepPrime_var/DP_variant_HCT116_PE2_Opti_220428',
+                  'MDA_PE2_Opti':           'DeepPrime_var/DP_variant_MDA_PE2_Opti_220428'}
 
-                        'PE2max': {
-                                'HEK293T': 'DeepPrime_var/PE2max/293T_PE2max_Opti',
-                                'MDA-MB-231': 'DeepPrime_var/PE2max/HeLa_PE2max_Opti'
-                                },
 
-                        'PE4max': {
-                                'HEK293T': 'DeepPrime_var/PE4max/293T_PE4max_Opti',
-                                'A549': 'DeepPrime_var/PE4max/A549_PE4max_Opti',
-                                'DLD1': 'DeepPrime_var/PE4max/DLD1_PE4max_Opti'
-                                },
+    model_type  = dict_model[pe_system]
+    mean        = pd.read_csv('%s/%s/%s_mean.csv' % (model_dir, model_type, pe_system), header=None, index_col=0, squeeze=True) # Train set mean (made with preprocessing.py)
+    std         = pd.read_csv('%s/%s/%s_std.csv'  % (model_dir, model_type, pe_system), header=None, index_col=0, squeeze=True) # Train set std (made with preprocessing.py)
 
-                        'NRCH_PE2':  {
-                                'HEK293T': 'DeepPrime_var/NRCH_PE2/293T_NRCH_PE2_Opti'
-                                },
+    test_feats, _  = select_cols(df_input)
 
-                        'NRCH_PE2max':  {
-                                'HEK293T': 'DeepPrime_var/NRCH_PE2max/293T_NRCH_PE2max_Opti',
-                                },
+    if model_type == 'DeepPrime_off':
+        g_test = seq_concat(df_input, col1='WT74_ref', col2='Edited74_On')
+    else:
+        g_test = seq_concat(df_input)
 
-                        'NRCH_PE4max':  {
-                                'DLD1': 'DeepPrime_var/NRCH_PE4max/DLD1_NRCH_PE4max_Opti',
-                                'NIH3T3': 'DeepPrime_var/NRCH_PE4max/NIH_NRCH_PE4max_Opti'
-                                },
-                        }
 
-    model_type = dict_model_path[pe_system][cell_line]
+    x_test      = (test_feats - mean) / std
 
-    mean = pd.read_csv('models/%s/%s_mean.csv' % (model_type, pe_system), header=None, index_col=0, squeeze=True) # Train set mean (made with preprocessing.py)
-    std  = pd.read_csv('models/%s/%s_std.csv' % (model_type, pe_system), header=None, index_col=0, squeeze=True) # Train set std (made with preprocessing.py)
+    g_test      = torch.tensor(g_test, dtype=torch.float32, device=device)
+    x_test      = torch.tensor(x_test.to_numpy(), dtype=torch.float32, device=device)
 
-    test_features = select_cols(df_input)
-
-    g_test = seq_concat(df_input)
-    x_test = (test_features - mean) / std
-
-    g_test = torch.tensor(g_test, dtype=torch.float32, device=device)
-    x_test = torch.tensor(x_test.to_numpy(), dtype=torch.float32, device=device)
-
-    models = [m_files for m_files in glob('models/%s/*.pt' % model_type)]
-    preds  = []
+    models      = [m_files for m_files in glob('%s/%s/*.pt' % (model_dir, model_type))]
+    preds       = []
 
     for m in models:
         model = GeneInteractionModel(hidden_size=128, num_layers=1).to(device)
         model.load_state_dict(torch.load(m))
         model.eval()
         with torch.no_grad():
-            g, x = g_test, x_test
-            g = g.permute((0, 3, 1, 2))
-            pred = model(g, x).detach().cpu().numpy()
+            g, x    = g_test, x_test
+            g       = g.permute((0, 3, 1, 2))
+            pred    = model(g, x).detach().cpu().numpy()
         preds.append(pred)
-    
+    #loop END: m
+
     # AVERAGE PREDICTIONS
     preds = np.squeeze(np.array(preds))
     preds = np.mean(preds, axis=0)
@@ -142,9 +130,7 @@ def calculate_deepprime_score(df_input, pe_system='PE2', cell_line='HEK293T'):
 
     return preds
 
-
 # # SAVE RESULTS
-
 # preds = pd.DataFrame(preds, columns=['Predicted_PE_efficiency'])
 # preds.to_csv('prediction.csv', index=False)
 
