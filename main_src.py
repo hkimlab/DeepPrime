@@ -1,6 +1,7 @@
 import os, sys, time, warnings
 import multiprocessing as mp
 import numpy as np
+import pandas as pd
 
 warnings.filterwarnings('ignore')
 
@@ -210,6 +211,7 @@ def deep_prime(analysistag, id, wtseq, editedseq, edit, dict_params):
 
         dict_top        = df_top_pegs.to_dict('index')
         dict_topdesign  = get_oligos(dict_top)
+
         outf            = open('%s/%s.top_designs.csv' % (output, id), 'w')
         header          = '#id,wtseq, edseq, spacer_top, spacer_bot, ext_top, ext_bot, dpcas, dpprime\n'
         outf.write(header)
