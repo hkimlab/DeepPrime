@@ -90,7 +90,7 @@ Usage:
 		
 		---Fine-Tuned Models---
 		PE2_Conv 				PE2 with conventional scaffold in HEK293T cells
-		PE2max 					PE2max with conventional scaffold in HEK293T cells
+		PE2max 					PE2max with optimized scaffold in HEK293T cells
 		HCT116_PE2_Opti			PE2 with optimized scaffold in HCT116 cells 
 		MDA_PE2_Opti			PE2 with optimized scaffold in MDA cells
 		PE4max_Opti				PE4max with optimized scaffold in HEK293T cells
