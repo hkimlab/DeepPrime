@@ -123,4 +123,18 @@ Usage:
 		|---utils.py
 		
 		
+For off-target analysis:
+Currently, only the model trained on PE2 with conventional scaffold in HEK293T cells is capable of running an additional analysis to predict off-target levels for specific pegRNAs.
+
+On the webtool:
+First select the Off-target compatible, PE2_Conv, and run your inputs. On the results page, use the check box indicating that you are currently running the off-target compatible analysis. Selecting individual rows will auto-fill the pegRNA IDs and the off-target sequences can be added to the text area in 74bp long formats.
+
+On the source code:
+Create two input files, offseq.txt and pegRNA.txt and run
+
+    
+    python main_src.py off_run <filename>
+
+    ex)
+    python main_src.py off_run Analysis_Example
 
