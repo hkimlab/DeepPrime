@@ -78,23 +78,44 @@ def calculate_deepprime_score(sBase_DIR, df_input, pe_system='PE2'):
     os.environ['CUDA_VISIBLE_DEVICES']='0'
     device     = 'cuda' if torch.cuda.is_available() else 'cpu'
 
-    model_dir  = '%s/models' % sBase_DIR
-    dict_model = {'PE2':                    'DeepPrime_base',
-                  'PE2_offtarget':          'DeepPrime_off',
-                  'NRCH_PE2':               'DeepPrime_var/DP_variant_293T_NRCH_PE2_Opti_220428',
-                  'PE2max':                 'DeepPrime_var/DP_variant_293T_PE2max_Opti_220428',
-                  'PE2_Conv':               'DeepPrime_var/DP_variant_293T_PE2_Conv_220428',
-                  'PE4max_Opti':            'DeepPrime_var/DP_variant_293T_PE4max_Opti_220728',
-                  'A549_PE4max_Opti':       'DeepPrime_var/DP_variant_A549_PE4max_Opti_220728',
-                  'DLD1_NRCHPE4max_Opti':   'DeepPrime_var/DP_variant_DLD1_NRCHPE4max_Opti_220728',
-                  'DLD1_PE4max_Opti':       'DeepPrime_var/DP_variant_DLD1_PE4max_Opti_220728',
-                  'HCT116_PE2_Opti':        'DeepPrime_var/DP_variant_HCT116_PE2_Opti_220428',
-                  'MDA_PE2_Opti':           'DeepPrime_var/DP_variant_MDA_PE2_Opti_220428'}
+    model_dir  = '%s/bin/models' % sBase_DIR
+    dict_model = { 'PE2':                   'DeepPrime_base',
+                   'PE2_offtarget':         'DeepPrime_off',
+
+                   'PE2_Conv':              'DeepPrime_var/DP_variant_293T_PE2_Conv_220428',
+                   'NRCH-PE2_HEK293T':      'DeepPrime_var/DP_variant_293T_NRCH_PE2_Opti_220428',
+
+                   'PE2_Opti_HCT116':       'DeepPrime_var/DP_variant_HCT116_PE2_Opti_220428',
+                   'PE2_Opti_MDA':          'DeepPrime_var/DP_variant_MDA_PE2_Opti_220428',
+
+                   'PE2max_Opti_HEK239T':   'DeepPrime_var/DP_variant_293T_PE2max_Opti_220428',
+                   'PE2max_Opti_Hela':      'DeepPrime_var/DP_variant_HeLa_PE2max_Opti_220815',
+                   'PE2max_Opti_A549':      'DeepPrime_var/DP_variant_A549_PE2max_Opti_221114',
+                   'PE2max_Opti_DLD1':      'DeepPrime_var/DP_variant_DLD1_PE2max_Opti_221114',
+
+                   'NRCH-PE2max_Opti_HEK293T':      'DeepPrime_var/DP_variant_293T_NRCH-PE2max_Opti_220815',
+
+                   'PE4max_Opti_HEK293T':           'DeepPrime_var/DP_variant_293T_PE4max_Opti_220728',
+                   'PE4max_Opti_A549':              'DeepPrime_var/DP_variant_A549_PE4max_Opti_220728',
+                   'PE4max_Opti_DLD1':              'DeepPrime_var/DP_variant_DLD1_PE4max_Opti_220728',
+
+                   'NRCH-PE4max_Opti_DLD1':         'DeepPrime_var/DP_variant_DLD1_NRCHPE4max_Opti_220728',
+                   'NRCH-PE4max_Opti_NIH':          'DeepPrime_var/DP_variant_NIH_NRCHPE4max_Opti_220815',
+
+                   'PE2max_epegRNA_Opti_HEK293T':   'DeepPrime_var/DP_variant_293T_PE2max_epegRNA_Opti_220428',
+                   'PE2max_epegRNA_Opti_A549':      'DeepPrime_var/DP_variant_A549_PE2max_epegRNA_Opti_220428',
+
+                   'PE4max_epegRNA_Opti_HEK293T':   'DeepPrime_var/DP_variant_293T_PE4max_epegRNA_Opti_220428',
+                   'PE4max_epegRNA_Opti_A549':      'DeepPrime_var/DP_variant_A549_PE4max_epegRNA_Opti_220428',
+                  }
 
 
     model_type  = dict_model[pe_system]
-    mean        = pd.read_csv('%s/%s/%s_mean.csv' % (model_dir, model_type, pe_system), header=None, index_col=0, squeeze=True) # Train set mean (made with preprocessing.py)
-    std         = pd.read_csv('%s/%s/%s_std.csv'  % (model_dir, model_type, pe_system), header=None, index_col=0, squeeze=True) # Train set std (made with preprocessing.py)
+    mean        = pd.read_csv('%s/%s/mean.csv' % (model_dir, model_type), header=None, index_col=0, squeeze=True) # Train set mean (made with preprocessing.py)
+    std         = pd.read_csv('%s/%s/std.csv'  % (model_dir, model_type), header=None, index_col=0, squeeze=True) # Train set std (made with preprocessing.py)
+
+    dpmean = float(open('%s/%s/dp_mean.csv' % (model_dir, model_type), 'r').readline())  #  DP scores from test set
+    dpstd  = float(open('%s/%s/dp_std.csv' % (model_dir, model_type), 'r').readline())  #  DP scores from test set
 
     test_feats, _  = select_cols(df_input)
 
@@ -128,7 +149,11 @@ def calculate_deepprime_score(sBase_DIR, df_input, pe_system='PE2'):
     preds = np.mean(preds, axis=0)
     preds = np.exp(preds) - 1
 
-    return preds
+    zscores = []
+    for pred in preds:
+        zscores.append((pred - dpmean) / dpstd)
+
+    return preds,zscores
 
 # # SAVE RESULTS
 # preds = pd.DataFrame(preds, columns=['Predicted_PE_efficiency'])

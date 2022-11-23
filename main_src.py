@@ -2,6 +2,13 @@ import os, sys, time, warnings
 import multiprocessing as mp
 import numpy as np
 import pandas as pd
+import matplotlib as mpl
+mpl.use('Agg')
+import matplotlib.pyplot as plt
+from matplotlib.ticker import Locator
+from scipy import stats
+from sklearn.preprocessing import minmax_scale
+
 
 warnings.filterwarnings('ignore')
 
@@ -152,7 +159,7 @@ def mp_processor(parameters):
         wtseq            = df_temp[1].upper()
         editedseq        = df_temp[2].upper()
         edit             = df_temp[3]
-        deep_prime(analysistag, id, wtseq, editedseq, edit, dict_params)
+        deep_prime(analysistag, id, wtseq, editedseq, edit, dict_params, out_dir)
 
     # loop END: idx
 
@@ -169,9 +176,12 @@ def deep_prime(analysistag, id, wtseq, editedseq, edit, dict_params):
     pe_system   = dict_params['PE_system']
     edit_type   = edit[:-1]
     edit_len    = int(edit[-1])
+    top         = 5
 
-    output      = '%s/data/%s/output' % (sBASE_DIR, analysistag)
-    os.makedirs(output, exist_ok=True)
+    results    = '%s/results' % outdir
+    plots      = '%s/matplot' % outdir
+    os.makedirs(results, exist_ok=True)
+    os.makedirs(plots, exist_ok=True)
 
     ## FeatureExtraction Class
     cFeat = FeatureExtraction()
@@ -194,60 +204,143 @@ def deep_prime(analysistag, id, wtseq, editedseq, edit, dict_params):
         list_Guide30 = [WT74[:30] for WT74 in df['WT74_On']]
 
         df['DeepSpCas9_score'] = calculate_DeepSpCas9_score(sBASE_DIR, list_Guide30)
-        df['DeepPrime_score']  = calculate_deepprime_score(sBASE_DIR, df, pe_system)
+        df['DeepPrime_score'], df['Zscores']  = calculate_deepprime_score(sBASE_DIR, df, pe_system)
+
         sorted_df = df.sort_values(by=['DeepPrime_score'], ascending=False)
 
-        df_top_pegs = sorted_df[:10]
+        df_top_pegs = sorted_df[:top]
+        dict_top    = df_top_pegs.to_dict('index')
+
+
+        list_scores     = sorted(df['Zscores'])
+        list_minmax     = minmax_scale(list_scores)
+
+        list_topdesign  = get_oligos(plots, list_scores, dict_top)
+
+        rank_plots (plots, list_scores, list_minmax, list_topdesign)
+
+        header          = 'id,guide,pbsrtt,wtseq,edseq,spacer_top,spacer_bot,ext_top,ext_bot,dpcas,dpprime,pbslen,rttlen,edittype,zscore,percentile,plotpath'
+        outf = open('%s/%s.top_designs.csv' % (results, id), 'w')
+        outf.write('%s\n' % header)
+        for data in list_topdesign:
+            out = ','.join([str(col) for col in data])
+            outf.write('%s\n' % out)
+        #loop END: id
+        outf.close()
 
         ## Save result file
         # df.to_feather('%s/%s.feather' % (outdir, sID))
-        sorted_df.to_csv('%s/%s.csv' % (output, id), index=False)
-
-        dp_score        = df.DeepPrime_score
-        tot_pegRNAs     = len(dp_score)
-        ave_DPScore     = np.mean(dp_score)
-        ave_DPStop5     = np.mean(dp_score.sort_values(ascending=False).head(5))
-        list_stat       = [cFeat.input_id, tot_pegRNAs, ave_DPScore, ave_DPStop5]
-
-        dict_top        = df_top_pegs.to_dict('index')
-        dict_topdesign  = get_oligos(dict_top)
-
-        outf            = open('%s/%s.top_designs.csv' % (output, id), 'w')
-        header          = '#id,wtseq, edseq, spacer_top, spacer_bot, ext_top, ext_bot, dpcas, dpprime\n'
-        outf.write(header)
-        for id in dict_topdesign:
-            outf.write('%s,%s\n' % (id, ','.join([str(data) for data in dict_topdesign[id]])))
-        #loop END: id
-        outf.close()
-        return list_stat, df_top_pegs
+        sorted_df.to_csv('%s/%s.csv' % (results, id), index=False)
+        return list_topdesign
     #if END:
 # def END: deep_prime
 
-def get_oligos (dict_top):
+def get_oligos (plotphp, list_scores, dict_top):
 
-    dict_output = {}
-
+    list_output = []
     for index in dict_top:
         id          = dict_top[index]['ID']
         wtseq       = dict_top[index]['WT74_On']
-        edseq       = dict_top[index]['Edited74_On']
+        edseq       = dict_top[index]['EditedwNote']
         gN19        = dict_top[index]['gN19']
         RTPBS       = dict_top[index]['Edited74_On'].strip('x')
         dpcas       = dict_top[index]['DeepSpCas9_score']
         dpprime     = dict_top[index]['DeepPrime_score']
+        pbslen      = dict_top[index]['PBSlen']
+        rttlen      = dict_top[index]['RTlen']
+        edit        = dict_top[index]['AltKey']
+        zscore      = dict_top[index]['Zscores']
+        percentile  = '%sth' % (int(stats.percentileofscore(list_scores, zscore)))
+
+        plotpath    = '%s/%s.png' % (plotphp, id)
 
         spacer_top  = 'cacc%sgtttt' % gN19
         spacer_bot  = 'ctctaaaac%s' % reverse_complement(gN19)
-        ext_top     = 'gtgc%s' % RTPBS
-        ext_bot     = 'aaaa%s' % reverse_complement(RTPBS)
+        ext_top     = 'gtgc%s' % reverse_complement(RTPBS)
+        ext_bot     = 'aaaa%s' % RTPBS
 
-        if id not in dict_output:
-            dict_output[id] = ''
-        dict_output[id] = [wtseq, edseq, spacer_top, spacer_bot, ext_top, ext_bot, dpcas, dpprime]
+        list_output.append([id, gN19, RTPBS, wtseq, edseq, spacer_top, spacer_bot, ext_top, ext_bot, dpcas, dpprime, pbslen, rttlen, edit, zscore, percentile, plotpath])
     #loop END: index
 
-    return dict_output
+    return list_output
 # def END: get_oligos
+
+
+def rank_plots (plots, list_scores, list_percents, list_top):
+    for data in list_top:
+        pegID      = data[0]
+        zscore     = data[14]
+        rank       = sorted(list_scores + [zscore]).index(zscore) # used as index for line
+        outplot    = '%s/%s.png' % (plots, pegID)
+
+        print('MATPLOTLIB - Rank Plot - %s' % pegID)
+        matplot_scatter (list_scores, list_percents, outplot, zscore)
+    #loop END: data
+# def END: rank_plots
+
+
+def matplot_scatter(list_scores, list_percents, outf, rank):
+    list_X, list_Y  = [], []
+    for x, y in zip(list_scores, list_percents):
+        list_X.append(x)
+        list_Y.append(y*100)
+
+    assert len(list_X) == len(list_Y)
+    ### Figure Size ###
+    FigWidth         = 12
+    FigHeight        = 5
+
+    OutFig  = plt.figure(figsize=(FigWidth, FigHeight))
+    SubPlot = OutFig.add_subplot(111)
+
+    ### Marker ###########
+    Red             = 0
+    Green           = 0
+    Blue            = 0
+    MarkerSize      = 25
+    Circle          = 'o'
+    DownTriangle    = 'v'
+    #######################
+
+    ### Log Start Point ###
+    LimitThresh     = 10
+    #######################
+
+    ### Axis Range ########
+    Xmin = min(list_scores)
+    Xmax = max(list_scores)
+    Ymin = 0
+    Ymax = 100
+    ########################
+
+    ### Tick Marks #########
+    TickScale     = 1
+    MajorTickSize = 10
+    MinorTickSize = 5
+
+    plt.xlim(xmin=Xmin, xmax=Xmax)
+    plt.ylim(ymin=Ymin, ymax=Ymax)
+    #plt.xscale('symlog', linthreshx=LimitThresh)
+    #plt.yscale('symlog', linthreshy=LimitThresh)
+
+    #plt.axes().xaxis.set_minor_locator(MinorSymLogLocator(TickScale))
+    #plt.axes().yaxis.set_minor_locator(MinorSymLogLocator(TickScale))
+
+    plt.tick_params(which='major', length=MajorTickSize)
+    plt.tick_params(which='minor', length=MinorTickSize)
+
+    #Set xticks as percentiles
+    #p = np.array([0.0, 25.0, 50.0, 75.0, 100.0])
+    #plt.yticks((len(list_Y) - 1) * p / 100., map(str, p))
+
+    plt.vlines(rank, ymin=Ymin, ymax=Ymax, colors='red')
+    plt.xlabel('DeepPrime Score')
+    plt.ylabel('Score Rank')
+    SubPlot.scatter(list_X, list_Y, marker=Circle, color='black', s=MarkerSize)
+    OutFig.savefig(outf)
+
+#def END: matplot
+
 
 
 def main():

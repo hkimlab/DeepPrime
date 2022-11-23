@@ -6,7 +6,6 @@ tf.disable_v2_behavior()
 from src.utils import preprocess_seq
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-tf.get_logger().setLevel('INFO')
 
 class Deep_xCas9(object):
     def __init__(self, filter_size, filter_num, node_1=80, node_2=60, l_rate=0.005):
@@ -113,7 +112,7 @@ def calculate_DeepSpCas9_score(sBase_DIR, list_target30):
     TEST_X = preprocess_seq(list_target30, 30)
     TEST_X_nohot = list_target30
 
-    best_model_path = '%s/models/DeepSpCas9' % sBase_DIR
+    best_model_path = '%s/bin/models/DeepSpCas9' % sBase_DIR
     best_model      = 'PreTrain-Final-3-5-7-100-70-40-0.001-550-80-60'
     valuelist       = best_model.split('-')
     fulllist        = []

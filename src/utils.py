@@ -37,6 +37,7 @@ def preprocess_seq(data, seq_length):
 
 
 def seq_concat(data, col1='WT74_On', col2='Edited74_On', seq_length=74):
+
     wt = preprocess_seq(data[col1], seq_length)
     ed = preprocess_seq(data[col2], seq_length)
     g = np.concatenate((wt, ed), axis=1)

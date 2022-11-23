@@ -70,37 +70,78 @@ Usage:
 	The data directory functions as the main I/O path, with filename corresponding to designated analysis/experiment tags.
 
 	Run Command:
-	python main_src.py main_run Analysis_Example
 
-	Input:
-		seq.txt 	  --> Unedited sequences (121 bp), Unedited sequences (121-124 bp) 
-		options.txt   --> <PE model>,<PBS min>, <PBS max>, <RTT max>, <edit type, length>
+	Input WT/Edited Sequences:
+        python main_src.py main_run <filename>
 
-		Ex)
-		seq.txt 	  --> ATGACAATAAAAGACAACACCCTTGCCTTGTGGAGTTTTCAAAGCTCCCAGAAACTGAGAAGAACTATAACCTGCAAATGTCAACTGAAACCTTAAAGTGAGTATTTAATTGAGCTGAAGT,ATGACAATAAAAGACAACACCCTTGCCTTGTGGAGTTTTCAAAGCTCCCAGAAACTGAGACGAACTATAACCTGCAAATGTCAACTGAAACCTTAAAGTGAGTATTTAATTGAGCTGAAGT
-		options.txt   --> PE2,1,17,40,sub1 #single line
+        ex)
+        python main_src.py main_run Analysis_Example
 
-	Output:
-		pegRNA#.csv 			#all pegRNA designs for each input in seq.txt
-		pegRNA#_top_designs.csv #top 10 pegRNAs per input with spacer and extension oligo sequences
+        Input:
+            seq.txt 	  --> Unedited sequences (121 bp), Unedited sequences (121-124 bp)
+            options.txt   --> <PE model>, <PBS min>, <PBS max>, <RTT max>, <Edit type, length>
+
+            ex)
+            seq.txt 	  --> ATGACAATAAAAGACAACACCCTTGCCTTGTGGAGTTTTCAAAGCTCCCAGAAACTGAGAAGAACTATAACCTGCAAATGTCAACTGAAACCTTAAAGTGAGTATTTAATTGAGCTGAAGT,ATGACAATAAAAGACAACACCCTTGCCTTGTGGAGTTTTCAAAGCTCCCAGAAACTGAGACGAACTATAACCTGCAAATGTCAACTGAAACCTTAAAGTGAGTATTTAATTGAGCTGAAGT
+            options.txt   --> PE2,1,17,40,sub1 #single line
+
+        Output:
+            pegRNA#.csv 			#all pegRNA designs for each input in seq.txt
+            pegRNA#_top_designs.csv #top 10 pegRNAs per input with spacer and extension oligo sequences
+
+
+    Input ClinVar ID:
+        python main_src.py clinvar_check  <filename>;
+
+        ex)
+        python main_src.py clinvar_check Analysis_Example
+
+        Input:
+            clinvar_run.txt   --> <ClinVar ID>, <model or therapy>  #ClinVar ID can be VCV ID or variant ID
+
+        Output:
+            seq.txt 	  --> Unedited sequences (121 bp), Unedited sequences (121-124 bp)
+            options.txt   --> <PE model>, <PBS min>, <PBS max>, <RTT max>, <Edit type, length>
+
+    After clinvar_check: input for main_run is automatically generated.
+
+    The main script uses the following directory map:
+    The data directory functions as the main I/O path, with filename corresponding to designated analysis or experiment tags.
 	
-	Current available PE models:
-		----------On-target----------
-		PE2						Baseline: PE2 with conventional scaffold in HEK293T cells
-		
-		---Fine-Tuned Models---
-		PE2_Conv 				PE2 with conventional scaffold in HEK293T cells
-		PE2max 					PE2max with optimized scaffold in HEK293T cells
-		HCT116_PE2_Opti			PE2 with optimized scaffold in HCT116 cells 
-		MDA_PE2_Opti			PE2 with optimized scaffold in MDA cells
-		PE4max_Opti				PE4max with optimized scaffold in HEK293T cells
-		DLD1_PE4max_Opti		PE4max with optimized scaffold in DLD1 cells
-		A549_PE4max_Opti		PE4max with optimized scaffold in A549 cells
-		NRCH_PE2				NRCH_PE2 with conventional scaffold in HEK293T cells
-		DLD1_NRCHPE4max_Opti	NRCH_PE4max with optimized scaffold in DLD1 cells
-		
-		----------Off-target compatible----------
-		PE2_Conv				PE2 with conventional scaffold in HEK293T cells
+   Current available PE models:
+        ----------On-target----------
+        PE2		                Baseline: PE2 with conventional scaffold in HEK293T cells
+
+        ---Fine-Tuned Models---
+        PE2_Conv 	              		PE2 with conventional scaffold in HEK293T cells
+        NRCH_PE2_HEK293T	     	    NRCH_PE2 with conventional scaffold in HEK293T cells
+
+        PE2_Opti_HCT116                 PE2 with optimized scaffold in HCT116 cells
+        PE2_Opti_MDA                    PE2 with optimized scaffold in MDA cells
+
+        PE2max_Opti_HEK239T             PE2max with optimized scaffold in HEK293T cells
+        PE2max_Opti_HeLa                PE2max with optimized scaffold in HeLa cells
+        PE2max_Opti_A549                PE2max with optimized scaffold in A549 cells
+        PE2max_Opti_DLD1                PE2max with optimized scaffold in DLD1 cells
+
+        NRCH-PE2max_Opti_HEK293T        NRCH-PE2max with optimized scaffold in HEK293T cells
+
+        PE4max_Opti_HEK293T             PE4max with optimized scaffold in HEK293T cells
+        PE4max_Opti_A549                PE4max with optimized scaffold in A549 cells
+        PE4max_Opti_DLD1                PE4max with optimized scaffold in DLD1 cells
+
+        NRCH-PE4max_Opti_DLD1           NRCH-PE4max with optimized scaffold in DLD1 cells
+        NRCH-PE4max_Opti_NIH            NRCH-PE4max with optimized scaffold in NIH cells
+
+        PE2max_epegRNA_Opti_HEK293T     PE2max combined epegRNA with optimized scaffold in HEK293T cells
+        PE2max_epegRNA_Opti_A549        PE2max combined epegRNA with optimized scaffold in A549 cells
+
+        PE4max_epegRNA_Opti_HEK293T     PE4max combined epegRNA with optimized scaffold in HEK293T cells
+        PE4max_epegRNA_Opti_A549        PE4max combined epegRNA with optimized scaffold in A549 cells
+
+
+        ----------Off-target compatible----------
+        PE2_Conv		        		PE2 with conventional scaffold in HEK293T cells
 
 
 	working dir
@@ -108,6 +149,7 @@ Usage:
 		|---Analysis_Example
 			|---seqs.txt
 			|---options.txt
+			|---clinvarrun.txt
 		|--output
 
 	|----models
