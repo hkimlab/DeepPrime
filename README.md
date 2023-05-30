@@ -1,27 +1,26 @@
-Table of Contents
+# Table of Contents
 - About
 - Installation
 - Usage
 
 
-About:
+## About:
 
-	DeepPrime is a deep-learning-based prime editing efficiency prediction tool developed in Laboratory of Genome Editing, Yonsei University. 
-	It greatly expands upon the previous start-of-the-art pegRNA activity prediction model, DeepPE, which was limited to a specific set of edit type and length combinations.
+DeepPrime is a deep-learning-based prime editing efficiency prediction tool developed in Laboratory of Genome Editing, Yonsei University. 
 
-	DeepPrime is developed to predict efficiencies of a nearly all feasible combinations of pegRNA designs.
-	We integrated CNN & RNN to extract inter-sequence features between target DNA and corresponding pegRNA.
-	DeepPrime was trained using 259K pegRNAs with PBS lengths ranging from 1 to 17, RT lengths ranging from 1 to 50, Edit positions ranging from 1 to 30, and editing lengths ranging from 1 to 3.
+It greatly expands upon the previous start-of-the-art pegRNA activity prediction model, DeepPE, which was limited to a specific set of edit type and length combinations.
 
-
-Installation:
-
-	The webtool app can accommodate most applications by choosing the most appropriate model parameters for your experimental conditions. 
-	For processing large number of pegRNAs, researchers can download zipped source code, install the necessary python packages, and run DeepPrime on their local systems. We recommend using a Linux-based OS.
+DeepPrime is developed to predict efficiencies of a nearly all feasible combinations of pegRNA designs. We integrated CNN & RNN to extract inter-sequence features between target DNA and corresponding pegRNA. DeepPrime was trained using 259K pegRNAs with PBS lengths ranging from 1 to 17, RT lengths ranging from 1 to 50, Edit positions ranging from 1 to 30, and editing lengths ranging from 1 to 3.
 
 
+## Installation:
 
-	Linux (CentOS/Ubuntu) commands:
+The webtool app can accommodate most applications by choosing the most appropriate model parameters for your experimental conditions. 
+
+For processing large number of pegRNAs, researchers can download zipped source code, install the necessary python packages, and run DeepPrime on their local systems. We recommend using a Linux-based OS.
+
+
+### Linux (CentOS/Ubuntu) commands:
 
 	- Install Python OR Miniconda (https://docs.conda.io/en/latest/miniconda.html)
 		
@@ -65,7 +64,7 @@ Installation:
 		unzip DeepPrime_src_wExamples.zip
 
 
-Usage:
+## Usage:
 	The main script uses the above directory map:
 	The data directory functions as the main I/O path, with filename corresponding to designated analysis/experiment tags.
 
