@@ -1,9 +1,10 @@
 import os, sys
 import numpy as np
 import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
+
 from src.utils import preprocess_seq
 
-tf.disable_v2_behavior()
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 class Deep_xCas9(object):
@@ -103,7 +104,7 @@ def Model_Finaltest(sess, TEST_X, model):
 
 def calculate_DeepSpCas9_score(sBase_DIR, list_target30):
     # TensorFlow config
-    conf = tf.ConfigProto()
+    conf = tf.compat.v1.ConfigProto()
     conf.gpu_options.allow_growth = True
     os.environ['CUDA_VISIBLE_DEVICES'] = '0'
     best_model_cv = 0.0
@@ -111,10 +112,10 @@ def calculate_DeepSpCas9_score(sBase_DIR, list_target30):
     TEST_X = preprocess_seq(list_target30, 30)
     TEST_X_nohot = list_target30
 
-    best_model_path = '%s/models/DeepSpCas9' % sBase_DIR
-    best_model = 'PreTrain-Final-3-5-7-100-70-40-0.001-550-80-60'
-    valuelist = best_model.split('-')
-    fulllist = []
+    best_model_path = '%s/bin/models/DeepSpCas9' % sBase_DIR
+    best_model      = 'PreTrain-Final-3-5-7-100-70-40-0.001-550-80-60'
+    valuelist       = best_model.split('-')
+    fulllist        = []
 
     for value in valuelist:
         if value == 'True':
@@ -139,7 +140,8 @@ def calculate_DeepSpCas9_score(sBase_DIR, list_target30):
     if3d = False
     inception = False
     args = [filter_size, filter_num, l_rate, load_episode]
-    tf.reset_default_graph()
+    tf.compat.v1.reset_default_graph()
+
     with tf.Session(config=conf) as sess:
         sess.run(tf.global_variables_initializer())
         model = Deep_xCas9(filter_size, filter_num, node_1, node_2, args[2])

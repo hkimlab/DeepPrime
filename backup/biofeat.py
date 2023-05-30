@@ -16,7 +16,7 @@ nAltIndex = 60  # 60nts --- Alt --- 60nts *0-based
 
 def reverse_complement(sSeq):
     dict_sBases = {'A': 'T', 'C': 'G', 'G': 'C', 'T': 'A', 'N': 'N', 'U': 'U', 'n': '',
-                   '.': '.', '*': '*', 'a': 't', 'c': 'g', 'g': 'c', 't': 'a'}
+                   '.': '.', '*': '*', 'a': 't', 'c': 'g', 'g': 'c', 't': 'a', '>':'>'}
     list_sSeq = list(sSeq)  # Turns the sequence in to a gigantic list
     list_sSeq = [dict_sBases[sBase] for sBase in list_sSeq]
     return ''.join(list_sSeq)[::-1]
@@ -115,11 +115,11 @@ class FeatureExtraction:
     # def End: __init__
     
     def get_input(self, wt_seq, ed_seq, edit_type, edit_len):
-        self.sWTSeq = wt_seq
-        self.sEditedSeq = ed_seq
-        self.sAltKey = edit_type + str(edit_len)
-        self.sAltType = edit_type
-        self.nAltLen = edit_len
+        self.sWTSeq         = wt_seq
+        self.sEditedSeq     = ed_seq
+        self.sAltKey        = edit_type + str(edit_len)
+        self.sAltType       = edit_type
+        self.nAltLen        = edit_len
 
         if   self.sAltType.startswith('sub'): self.type_sub = 1
         elif self.sAltType.startswith('del'): self.type_del = 1
@@ -160,13 +160,11 @@ class FeatureExtraction:
         PAM: 4-nt sequence
         """
 
-        
-
         nMaxEditPosWin = nMaxRT + 3  # Distance between PAM and mutation
 
-        dict_sWinSize = {'sub': {1: [nMaxRT - 1 - 3, 6], 2: [nMaxRT - 2 - 3, 6], 3: [nMaxRT - 3 - 3, 6]},
-                        'ins': {1: [nMaxRT - 2 - 3, 6], 2: [nMaxRT - 3 - 3, 6], 3: [nMaxRT - 4 - 3, 6]},
-                        'del': {1: [nMaxRT - 1 - 3, 6], 2: [nMaxRT - 1 - 3, 6], 3: [nMaxRT - 1 - 3, 6]}}
+        dict_sWinSize  = {'sub': {1: [nMaxRT - 1 - 3, 6], 2: [nMaxRT - 2 - 3, 6], 3: [nMaxRT - 3 - 3, 6]},
+                          'ins': {1: [nMaxRT - 2 - 3, 6], 2: [nMaxRT - 3 - 3, 6], 3: [nMaxRT - 4 - 3, 6]},
+                          'del': {1: [nMaxRT - 1 - 3, 6], 2: [nMaxRT - 1 - 3, 6], 3: [nMaxRT - 1 - 3, 6]}}
 
         
         if 'NRCH' in pe_system: # for NRCH-PE PAM
@@ -181,15 +179,15 @@ class FeatureExtraction:
             for sReIndex in regex.finditer(sRE, self.sWTSeq, overlapped=True):
 
                 if sStrand == '+':
-                    nIndexStart = sReIndex.start()
-                    nIndexEnd = sReIndex.end() - 1
-                    sPAMSeq = self.sWTSeq[nIndexStart:nIndexEnd]
-                    sGuideSeq = self.sWTSeq[nIndexStart - 20:nIndexEnd]
+                    nIndexStart     = sReIndex.start()
+                    nIndexEnd       = sReIndex.end() - 1
+                    sPAMSeq         = self.sWTSeq[nIndexStart:nIndexEnd]
+                    sGuideSeq       = self.sWTSeq[nIndexStart - 20:nIndexEnd]
                 else:
-                    nIndexStart = sReIndex.start() + 1
-                    nIndexEnd = sReIndex.end()
-                    sPAMSeq = reverse_complement(self.sWTSeq[nIndexStart:nIndexEnd])
-                    sGuideSeq = reverse_complement(self.sWTSeq[nIndexStart:nIndexEnd + 20])
+                    nIndexStart     = sReIndex.start() + 1
+                    nIndexEnd       = sReIndex.end()
+                    sPAMSeq         = reverse_complement(self.sWTSeq[nIndexStart:nIndexEnd])
+                    sGuideSeq       = reverse_complement(self.sWTSeq[nIndexStart:nIndexEnd + 20])
 
                 nAltPosWin = set_alt_position_window(sStrand, self.sAltKey, nAltIndex, nIndexStart, nIndexEnd,
                                                     self.nAltLen)
@@ -536,10 +534,11 @@ class FeatureExtraction:
 
     def make_output_df(self, bTest):
 
-        list_output = []
+        list_output      = []
         list_sOutputKeys = ['Tm1', 'Tm2', 'Tm2new', 'Tm3', 'Tm4', 'TmD', 'nGCcnt1', 'nGCcnt2', 'nGCcnt3',
-                        'fGCcont1', 'fGCcont2', 'fGCcont3', 'MFE3', 'MFE4']
+                            'fGCcont1', 'fGCcont2', 'fGCcont3', 'MFE3', 'MFE4']
 
+        nIDCnt = 0
         for sPAMKey in self.dict_sSeqs:
 
             sAltKey, sAltNotation, sStrand, nPAM_Nick, nAltPosWin, sPAMSeq, sGuideSeq = sPAMKey.split(',')
@@ -557,21 +556,30 @@ class FeatureExtraction:
                     nEditPos = nNickIndex - 59
 
             for sSeqKey in self.dict_sOutput[sPAMKey]:
+                dict_seq          = self.dict_sCombos[sPAMKey][sSeqKey]
+                sRTTSeq, sPBSSeq  = sSeqKey.split(',')
+                PBSlen            = len(sPBSSeq)
+                RTlen             = len(sRTTSeq)
 
-                dict_seq = self.dict_sCombos[sPAMKey][sSeqKey]
-                sRTTSeq, sPBSSeq = sSeqKey.split(',')
-                PBSlen = len(sPBSSeq)
-                RTlen = len(sRTTSeq)
-
-                sPBS_RTSeq = sPBSSeq + sRTTSeq
-                s5Bufferlen = 21 - PBSlen
-                s3Bufferlen = 53 - RTlen
-                sEDSeq74 = 'x' * s5Bufferlen + sPBS_RTSeq + 'x' * s3Bufferlen
+                sPBS_RTSeq        = sPBSSeq + sRTTSeq
+                s5Bufferlen       = 21 - PBSlen
+                s3Bufferlen       = 53 - RTlen
+                sEDSeq74          = 'x' * s5Bufferlen + sPBS_RTSeq + 'x' * s3Bufferlen
 
                 if self.sAltType.startswith('del'):
                     RHA_len = len(sRTTSeq) - nEditPos + 1
                 else:
                     RHA_len = len(sRTTSeq) - nEditPos - self.nAltLen + 1
+
+                if sStrand == '-':
+                    notation = reverse_complement(sAltNotation)
+
+                    if self.sAltType.startswith('del'): notation = ''.join(list(notation))[::-1]
+                    if self.sAltType.startswith('ins'): notation = ''.join(list(notation))[::-1]
+
+                else: notation = sAltNotation
+
+                edseq_wnote  = ' ' * s5Bufferlen + sPBS_RTSeq[:-(RHA_len+1)] + '(%s)' % notation.replace('>', '/') + sPBS_RTSeq[-RHA_len:]
 
                 if bTest:
 
@@ -583,19 +591,23 @@ class FeatureExtraction:
                                 nEditPos, self.nAltLen, RHA_len, self.type_sub, self.type_ins, self.type_del
                                 ] + [self.dict_sOutput[sPAMKey][sSeqKey][sKey] for sKey in list_sOutputKeys]
                 else:
-                    list_sOut = [self.input_id, sWTSeq74, sEDSeq74, 
-                                # dict_seq['RTPBS_right4'], dict_seq['AfterRTT_left4'],
+                    nIDCnt += 1
+                    sID = '%s.%s' % (self.input_id, nIDCnt)
+                    sSpacer_for_MFE = 'G' + sGuideSeq[1:-3]
+
+                    list_sOut = [sID, sWTSeq74, sEDSeq74, sSpacer_for_MFE, sPBS_RTSeq, edseq_wnote, sAltKey,
                                 len(sPBSSeq), len(sRTTSeq), len(sPBSSeq + sRTTSeq), nEditPos, self.nAltLen,
                                 RHA_len, self.type_sub, self.type_ins, self.type_del
                                 ] + [self.dict_sOutput[sPAMKey][sSeqKey][sKey] for sKey in list_sOutputKeys]
 
                 list_output.append(list_sOut)
             
-            # loop END: sSeqKey
+            #loop END: sSeqKey
 
-        hder_essen = ['ID', 'WT74_On', 'Edited74_On', 'PBSlen', 'RTlen', 'RT-PBSlen', 'Edit_pos', 'Edit_len', 'RHA_len',
-                    'type_sub', 'type_ins', 'type_del','Tm1', 'Tm2', 'Tm2new', 'Tm3', 'Tm4', 'TmD',
-                    'nGCcnt1', 'nGCcnt2', 'nGCcnt3', 'fGCcont1', 'fGCcont2', 'fGCcont3', 'MFE3', 'MFE4']
+        hder_essen = ['ID', 'WT74_On', 'Edited74_On', 'gN19', 'sPBS_RTSeq', 'EditedwNote', 'AltKey',
+                      'PBSlen', 'RTlen', 'RT-PBSlen', 'Edit_pos', 'Edit_len', 'RHA_len',
+                      'type_sub', 'type_ins', 'type_del','Tm1', 'Tm2', 'Tm2new', 'Tm3', 'Tm4', 'TmD',
+                      'nGCcnt1', 'nGCcnt2', 'nGCcnt3', 'fGCcont1', 'fGCcont2', 'fGCcont3', 'MFE3', 'MFE4']
         hder_test  = ['PBSSeq', 'RTTSeq', 'sForTm1', 'sForTm2', 'sForTm2new', 'sForTm3_1', 'sForTm3_2',
                     'sForTm4_1', 'sForTm4_2', 'gN19', 'AltType']
 
