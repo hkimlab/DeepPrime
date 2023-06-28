@@ -1,9 +1,5 @@
 import sys
 import numpy as np
-import torch
-from torch.utils.data import Dataset
-from typing import Tuple
-
 
 def preprocess_seq(data, seq_length):
 
@@ -53,3 +49,38 @@ def select_cols(data):
                             'nGCcnt1', 'nGCcnt2', 'nGCcnt3', 'fGCcont1', 'fGCcont2', 'fGCcont3', 'MFE3', 'MFE4', 'DeepSpCas9_score']]
 
     return features
+
+
+def print_logo():
+
+    logo = """
+                                                                                                    
+              ******,                                *****-         **,                             
+              @@@@@@@@                              *@@@@@@~        @@-                             
+             ,@#===#@@=                             =@!.!@@~                                        
+             $@*   ,$@=   -!!:     !!!.   ;; :!:   -#@   @@~ !!.!!,;!~  !- !!, ,!!;    -!!:         
+             $@!    =@=  #@@@@:  ~#@@@@  !@@#@@@~  :@@   @@~ @@@@* #$  #@@#@@@ @@@#   ,@@@@~        
+            ;@@     $@!.#@:  @; -@#  ;@  *@@: $@@. !@-,,#@; ,@#$$;*@$  @@#..@@$ ;@#  @@:  @@.       
+            ;@=    ~@@ !@#;;;@; @@*;;=@ ,#@~   @* .@@@@@@:  @@;   *@~ :@$, .@*  ;@# ~@#;;;@=        
+           ,#@.   .#@,-@@@@@@@;*@@@@@@@ ~@*   #@: .@@@=,,   @$.  -@@  =@=  #@-  ;@# *@@@@@@:        
+           ,@#   .~@# -@@      $@*      $@.  .@@~ @@-      *@$   ~@#  $@   @@-  !@ ~@@              
+           !@=;;;@@$. -@@   ;  $@*  .-  @@; ,#@~  @$,      *@:   *@. ;@@  :@!  -@@ ~@@~  :          
+           @@@@@@@,.  -@@$$$@  $@#$$$; =@@@$#@,  *@!      -@@    @@. ;@,  #@!  -@~ .=@@$$@          
+           ####!       :###-    ####   @@~$##-   $#;      ~##    #~ ,##   $$   ##,   ####           
+                                      ~@#,                                                          
+                                      $@*                                                           
+                                      =@:                                                           
+
+              DeepPrime: A deep-learning-based prime editing efficiency prediction tool
+                    Developed in Laboratory of Genome Editing, Yonsei University.
+                                            Version. 1.0.0
+
+Contact: 
+Goosang Yu                 (gsyu93@gmail.com)
+Jinman Joseph Park         (josephjinpark@gmail.com)
+Prof. Hui Kwon Kim         (huikwonkim@gmail.com)
+Prof. Hyongbum (Henry) Kim (hkim@yuhs.ac)
+
+    """
+
+    print(logo)

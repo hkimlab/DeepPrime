@@ -1,12 +1,14 @@
 import os, sys
 import numpy as np
-import tensorflow.compat.v1 as tf
 from src.utils import preprocess_seq
+from silence_tensorflow import silence_tensorflow
+silence_tensorflow()
 
+import tensorflow.compat.v1 as tf
 tf.disable_v2_behavior()
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
-class Deep_xCas9(object):
+
+class Deep_SpCas9(object):
     def __init__(self, filter_size, filter_num, node_1=80, node_2=60, l_rate=0.005):
         length = 30
         self.inputs = tf.placeholder(tf.float32, [None, 1, length, 4])
@@ -142,7 +144,7 @@ def calculate_DeepSpCas9_score(sBase_DIR, list_target30):
     tf.reset_default_graph()
     with tf.Session(config=conf) as sess:
         sess.run(tf.global_variables_initializer())
-        model = Deep_xCas9(filter_size, filter_num, node_1, node_2, args[2])
+        model = Deep_SpCas9(filter_size, filter_num, node_1, node_2, args[2])
 
         saver = tf.train.Saver()
         saver.restore(sess, best_model_path + '/' + best_model)
@@ -151,9 +153,8 @@ def calculate_DeepSpCas9_score(sBase_DIR, list_target30):
     return list_score
 
 
-
 def main():
-    print('This is Biofeature extraction script')
+    print('This is DeepSpCas9 model script')
 
 
 if __name__ == '__main__':

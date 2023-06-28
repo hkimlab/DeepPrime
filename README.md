@@ -65,102 +65,107 @@ output:
 
   
 
-## Installation from source code:
+# Installation from source code:
 
 The webtool app can accommodate most applications by choosing the most appropriate model parameters for your experimental conditions. 
 
 For processing large number of pegRNAs, researchers can download zipped source code, install the necessary python packages, and run DeepPrime on their local systems. We recommend using a Linux-based OS.
 
-
-### Linux (CentOS/Ubuntu) commands:
-
-	- Install Python OR Miniconda (https://docs.conda.io/en/latest/miniconda.html)
+### 1. Install Python OR Miniconda
 		
-		- Python -
-		
-		wget https://www.python.org/ftp/python/3.8.12/Python-3.8.12.tgz
-		tar xzf Python-3.8.12.tgz
-		./configure --enable-optimizations
-		make altinstall
+Python official
+```bash
+wget https://www.python.org/ftp/python/3.8.12/Python-3.8.12.tgz
+tar xzf Python-3.8.12.tgz
+./configure --enable-optimizations
+make altinstall
+```
 
-		- Miniconda -
-		
-		wget https://repo.anaconda.com/miniconda/Miniconda3-py38_4.12.0-Linux-x86_64.sh
-		bash Miniconda3-py38_4.12.0-Linux-x86_64.sh
+[Miniconda](https://docs.conda.io/en/latest/miniconda.html)
+```bash
+wget https://repo.anaconda.com/miniconda/Miniconda3-py38_4.12.0-Linux-x86_64.sh
+bash Miniconda3-py38_4.12.0-Linux-x86_64.sh
+```
 
-	- Install Required Python Packages -
+### 2. Install Required Python Packages
+```
+pip install tensorflow==2.8.0     #Use pip linked to the above python installation
+pip install torch==1.10.0+cu113 torchvision==0.11.1+cu113 torchaudio===0.10.0+cu113 -f https://download.pytorch.org/whl/cu113/torch_stable.html
+pip install biopython==1.78 
+pip install pandas regex 
+```	
+### 3. [Install ViennaRNA](https://www.tbi.univie.ac.at/RNA/documentation.html#install)
+```
+wget https://www.tbi.univie.ac.at/RNA/download/sourcecode/2_5_x/ViennaRNA-2.5.1.tar.gz
+tar -zxvf ViennaRNA-2.5.1.tar.gz
+cd ViennaRNA-2.5.1
+./configure --with-python3	
+make
+make install
 
-		pip install tensorflow==2.8.0     #Use pip linked to the above python installation
-		pip install torch==1.10.0+cu113 torchvision==0.11.1+cu113 torchaudio===0.10.0+cu113 -f https://download.pytorch.org/whl/cu113/torch_stable.html
-		pip install biopython==1.78 
-		pip install pandas regex 
-		
-	- Install ViennaRNA https://www.tbi.univie.ac.at/RNA/documentation.html#install -
+- OR -
 
-		wget https://www.tbi.univie.ac.at/RNA/download/sourcecode/2_5_x/ViennaRNA-2.5.1.tar.gz
-		tar -zxvf ViennaRNA-2.5.1.tar.gz
-		cd ViennaRNA-2.5.1
-		./configure --with-python3	
-		make
-		make install
+conda install -c bioconda viennarna  *using Miniconda
 
-		- OR -
-		
-		conda install -c bioconda viennarna  *using Miniconda
-		
-		- OR -
-		 pip install ViennaRNA
+- OR -
 
-	- Download Source Code -
-		wget http://deepcrispr.info/DeepPrime/src/DeepPrime_src_wExamples.zip
-		unzip DeepPrime_src_wExamples.zip
+pip install ViennaRNA
+```
+
+### 4. Download Source Code
+```
+wget https://github.com/hkimlab/DeepPrime/archive/main.zip
+unzip main.zip
+```
+
+# Usage:
+The main script uses the above directory map:
+The data directory functions as the main I/O path, with filename corresponding to designated analysis/experiment tags.
+
+## Input format (.csv file)
+ID, Unedited sequences (121 bp), Unedited sequences (121bp), alt_type (sub1, sub2, sub3, ins1, ... , del3)
+| ID                     | RefSeq                                                                                                                    | Edited Seq                                                                                                                | EditType |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- | -------- |
+| BRCA1e17_pos34_tat_CAT | AATCCTTTGAGTGTTTTTCATTCTGCAGATGCTGAGTTTGTGTGTGAACGGACACTGAAATATTTTCTAGGAATTGCGGGAGGAAAATGGGTAGTTAGCTATTTCTGTAAGTATAATACTA | AATCCTTTGAGTGTTTTTCATTCTGCAGATGCTGAGTTTGTGTGTGAACGGACACTGAAACATTTTCTAGGAATTGCGGGAGGAAAATGGGTAGTTAGCTATTTCTGTAAGTATAATACTA | sub1     |
+| BRCA1e17_pos34_tat_CCA | AATCCTTTGAGTGTTTTTCATTCTGCAGATGCTGAGTTTGTGTGTGAACGGACACTGAAATATTTTCTAGGAATTGCGGGAGGAAAATGGGTAGTTAGCTATTTCTGTAAGTATAATACTA | AATCCTTTGAGTGTTTTTCATTCTGCAGATGCTGAGTTTGTGTGTGAACGGACACTGAAACCATTTCTAGGAATTGCGGGAGGAAAATGGGTAGTTAGCTATTTCTGTAAGTATAATACTA | sub3     |
+| BRCA1e17_pos34_tat_CCC | AATCCTTTGAGTGTTTTTCATTCTGCAGATGCTGAGTTTGTGTGTGAACGGACACTGAAATATTTTCTAGGAATTGCGGGAGGAAAATGGGTAGTTAGCTATTTCTGTAAGTATAATACTA | AATCCTTTGAGTGTTTTTCATTCTGCAGATGCTGAGTTTGTGTGTGAACGGACACTGAAACCCTTTCTAGGAATTGCGGGAGGAAAATGGGTAGTTAGCTATTTCTGTAAGTATAATACTA | sub3     |
+
+## Run Command:
+python DeepPrime.py [-h] [-f INPUT_FILE] [-n NAME] [-p {PE2,PE2max,PE2max-e,PE4max,PE4max-e,NRCH_PE2,NRCH_PE2max,NRCH_PE4max}] [--cell_type {HEK293T,A549,DLD1,HCT116,HeLa,MDA-MB-231,NIH3T3}] [--pbs_min PBS_MIN] [--pbs_max PBS_MAX] [--jobs JOBS] [--progress]
+
+Basic command: python DeepPrime.py -f [filename]
+
+```bash
+# example_input
+python DeepPrime.py -f ./example_input/dp_core_test.csv
+```
+```bash
+# example_input & choose PE4max system
+python DeepPrime.py -f ./example_input/dp_core_test.csv -p PE4max
+```
+```bash
+# example_input & choose PE4max system, cell type, and number of cores
+python DeepPrime.py -f ./example_input/dp_core_test.csv -p PE2max --cell_type DLD1 --jobs 4
+```
+## Optional arguments
+-h or --help: show a help message  
+-f or --input_file: input path (.csv file)  
+-n or --name: name tag of run (results directory name)  
+-p or --pe_type: PE system. Choose one of the available PE system (PE2,PE2max,PE2max-e,PE4max,PE4max-e,NRCH_PE2,NRCH_PE2max,NRCH_PE4max, PE2,PE2max,PE2max-e,PE4max,PE4max-e,NRCH_PE2,NRCH_PE2max,NRCH_PE4max). Some cell types support limited PE systems.  
+--cell_type: Cell type. Choose one of the available cell line.  
+--pbs_min: Minimum length of PBS. (1=<)  
+--pbs_max: Maximum length of PBS (=<17)
+--jobs: Number of cores for computing
+--progress: Show processing message
 
 
-## Usage:
-	The main script uses the above directory map:
-	The data directory functions as the main I/O path, with filename corresponding to designated analysis/experiment tags.
-
-	Run Command:
-
-	Input WT/Edited Sequences:
-        python main_src.py main_run <filename>
-
-        ex)
-        python main_src.py main_run Analysis_Example
-
-        Input:
-            seq.txt 	  --> Unedited sequences (121 bp), Unedited sequences (121-124 bp)
-            options.txt   --> <PE model>, <PBS min>, <PBS max>, <RTT max>, <Edit type, length>
-
-            ex)
-            seq.txt 	  --> ATGACAATAAAAGACAACACCCTTGCCTTGTGGAGTTTTCAAAGCTCCCAGAAACTGAGAAGAACTATAACCTGCAAATGTCAACTGAAACCTTAAAGTGAGTATTTAATTGAGCTGAAGT,ATGACAATAAAAGACAACACCCTTGCCTTGTGGAGTTTTCAAAGCTCCCAGAAACTGAGACGAACTATAACCTGCAAATGTCAACTGAAACCTTAAAGTGAGTATTTAATTGAGCTGAAGT
-            options.txt   --> PE2,1,17,40,sub1 #single line
-
-        Output:
-            pegRNA#.csv 			#all pegRNA designs for each input in seq.txt
-            pegRNA#_top_designs.csv #top 10 pegRNAs per input with spacer and extension oligo sequences
-
-
-    Input ClinVar ID:
-        python main_src.py clinvar_check  <filename>;
-
-        ex)
-        python main_src.py clinvar_check Analysis_Example
-
-        Input:
-            clinvar_run.txt   --> <ClinVar ID>, <model or therapy>  #ClinVar ID can be VCV ID or variant ID
-
-        Output:
-            seq.txt 	  --> Unedited sequences (121 bp), Unedited sequences (121-124 bp)
-            options.txt   --> <PE model>, <PBS min>, <PBS max>, <RTT max>, <Edit type, length>
-
-    After clinvar_check: input for main_run is automatically generated.
-
-    The main script uses the following directory map:
-    The data directory functions as the main I/O path, with filename corresponding to designated analysis or experiment tags.
+The main script uses the following directory map:
+The data directory functions as the main I/O path, with filename corresponding to designated analysis or experiment tags.
 	
    Current available PE models:
-        ----------On-target----------
+
+    ----------On-target----------
+
         PE2		                Baseline: PE2 with conventional scaffold in HEK293T cells
 
         ---Fine-Tuned Models---
@@ -196,17 +201,30 @@ For processing large number of pegRNAs, researchers can download zipped source c
 
 
 	working dir
-	|---data
-		|---Analysis_Example
-			|---seqs.txt
-			|---options.txt
-			|---clinvarrun.txt
-		|--output
+	|---example_input
 
 	|----models
-		|---DeepPrime_base
-		|---DeepPrime_off
-		|---DeepPrime_var
+		|---DeepPrime
+            |---DeepPrime_base
+            |---DeepPrime_off
+            |---DP_variant_293T_NRCH_PE2_Opti_220428
+            |---DP_variant_293T_NRCH-PE2max_Opti_220815
+            |---DP_variant_293T_PE2_Conv_220428
+            |---DP_variant_293T_PE2max_epegRNA_Opti_220428
+            |---DP_variant_293T_PE2max_Opti_220428
+            |---DP_variant_293T_PE4max_epegRNA_Opti_220428
+            |---DP_variant_293T_PE4max_Opti_220728
+            |---DP_variant_A549_PE2max_epegRNA_Opti_220428
+            |---DP_variant_A549_PE2max_Opti_221114
+            |---DP_variant_A549_PE4max_epegRNA_Opti_220428
+            |---DP_variant_A549_PE4max_Opti_220728
+            |---DP_variant_DLD1_NRCHPE4max_Opti_220728
+            |---DP_variant_DLD1_PE2max_Opti_221114
+            |---DP_variant_DLD1_PE4max_Opti_220728
+            |---DP_variant_HCT116_PE2_Opti_220428
+            |---DP_variant_HeLa_PE2max_Opti_220815
+            |---DP_variant_MDA_PE2_Opti_220428
+            |---DP_variant_NIH_NRCHPE4max_Opti_220815
 		|---DeepSpCas9
 
 	|----src
@@ -226,7 +244,7 @@ On the source code:
 Create two input files, offseq.txt and pegRNA.txt and run
 
     
-    python main_src.py off_run <filename>
+    python DeepPrime.py off_run <filename>
 
     ex)
     python main_src.py off_run Analysis_Example

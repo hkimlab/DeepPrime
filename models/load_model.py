@@ -22,7 +22,7 @@ def load_deepspcas9():
     return model_dir
 
 
-def load_deepprime(model_id='PE2', cell_type='HEK293T'):
+def load_deepprime(model_id='PE2', cell_type='HEK293T', silent=True):
     '''
     model_id: PE2, PE2max, PE4max, PE2max-e, PE4max-e, NRCH_PE2, NRCH_PE2max, NRCH_PE4max
     cell_rtpe: HEK293T, A549, DLD1, HCT116, HeLa, MDA-MB-231, NIH3T3
@@ -32,7 +32,8 @@ def load_deepprime(model_id='PE2', cell_type='HEK293T'):
 
     '''
 
-    print('get model: %s - %s' % (model_id, cell_type))
+    if silent: pass
+    else     : print('get model: %s - %s' % (model_id, cell_type))
 
     model_dir = inspect.getfile(DeepPrime).replace('/__init__.py', '').replace('\\__init__.py', '')
 

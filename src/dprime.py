@@ -77,11 +77,12 @@ class GeneInteractionModel(nn.Module):
 def calculate_deepprime_score(df_input, pe_system='PE2max', cell_type='HEK293T'):
 
     os.environ['CUDA_VISIBLE_DEVICES']='0'
-    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    if torch.cuda.is_available(): device = 'cuda'
+    else : device = 'cpu'
     
     from models.load_model import load_deepprime
 
-    model_dir, model_type = load_deepprime(pe_system, cell_type)
+    model_dir, model_type = load_deepprime(pe_system, cell_type, silent=True)
 
     mean = pd.read_csv('%s/DeepPrime_base/mean.csv' % model_dir, header=None, index_col=0).squeeze()
     std  = pd.read_csv('%s/DeepPrime_base/std.csv' % model_dir, header=None, index_col=0).squeeze()
@@ -99,7 +100,7 @@ def calculate_deepprime_score(df_input, pe_system='PE2max', cell_type='HEK293T')
 
     for m in models:
         model = GeneInteractionModel(hidden_size=128, num_layers=1).to(device)
-        model.load_state_dict(torch.load(m))
+        model.load_state_dict(torch.load(m, map_location=torch.device(device)))
         model.eval()
         with torch.no_grad():
             g, x = g_test, x_test
