@@ -156,7 +156,7 @@ python DeepPrime.py -f ./example_input/dp_core_test.csv -p PE2max --cell_type DL
 --cell_type: Cell type. Choose one of the available cell line.  
 --pbs_min: Minimum length of PBS. (1=<)  
 --pbs_max: Maximum length of PBS (=<17)
---jobs: Number of cores for computing
+--jobs: Number of cores for computing  
 --progress: Show processing message
 
 
