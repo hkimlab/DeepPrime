@@ -1,3 +1,11 @@
+<div align="center">
+  
+  <img src="https://github.com/hkimlab/DeepPrime/blob/main/docs/images/logo.png?raw=true" width="300"/>
+
+**Developed by Hyongbum Henry Kim's lab** </br>
+
+<div align="left">
+
 # Table of Contents
 - About
 - DeepPrime webtool
@@ -71,30 +79,28 @@ The webtool app can accommodate most applications by choosing the most appropria
 
 For processing large number of pegRNAs, researchers can download zipped source code, install the necessary python packages, and run DeepPrime on their local systems. We recommend using a Linux-based OS.
 
-### 1. Install Python OR Miniconda
-		
-Python official
+### 1. Install [Miniconda](https://docs.conda.io/en/latest/miniconda.html)
+
 ```bash
-wget https://www.python.org/ftp/python/3.8.12/Python-3.8.12.tgz
-tar xzf Python-3.8.12.tgz
-./configure --enable-optimizations
-make altinstall
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+bash Miniconda3-latest-Linux-x86_64.sh
 ```
 
-[Miniconda](https://docs.conda.io/en/latest/miniconda.html)
-```bash
-wget https://repo.anaconda.com/miniconda/Miniconda3-py38_4.12.0-Linux-x86_64.sh
-bash Miniconda3-py38_4.12.0-Linux-x86_64.sh
+### 2. Create and activate virtual environment
+```python
+conda create -n dprime python=3.8
+conda activate dprime
 ```
 
-### 2. Install Required Python Packages
+
+### 3. Install Required Python Packages
 ```
 pip install tensorflow==2.8.0     #Use pip linked to the above python installation
 pip install torch==1.10.0+cu113 torchvision==0.11.1+cu113 torchaudio===0.10.0+cu113 -f https://download.pytorch.org/whl/cu113/torch_stable.html
 pip install biopython==1.78 
-pip install pandas regex 
+pip install pandas regex silence-tensorflow 
 ```	
-### 3. [Install ViennaRNA](https://www.tbi.univie.ac.at/RNA/documentation.html#install)
+### 4. [Install ViennaRNA](https://www.tbi.univie.ac.at/RNA/documentation.html#install)
 ```
 wget https://www.tbi.univie.ac.at/RNA/download/sourcecode/2_5_x/ViennaRNA-2.5.1.tar.gz
 tar -zxvf ViennaRNA-2.5.1.tar.gz
@@ -105,22 +111,21 @@ make install
 
 - OR -
 
-conda install -c bioconda viennarna  *using Miniconda
+conda install -c bioconda viennarna # using Miniconda
 
 - OR -
 
 pip install ViennaRNA
 ```
 
-### 4. Download Source Code
+### 5. Download Source Code
 ```
 wget https://github.com/hkimlab/DeepPrime/archive/main.zip
 unzip main.zip
 ```
 
 # Usage:
-The main script uses the above directory map:
-The data directory functions as the main I/O path, with filename corresponding to designated analysis/experiment tags.
+
 
 ## Input format (.csv file)
 ID, Unedited sequences (121 bp), Unedited sequences (121bp), alt_type (sub1, sub2, sub3, ins1, ... , del3)
@@ -160,12 +165,9 @@ python DeepPrime.py -f ./example_input/dp_core_test.csv -p PE2max --cell_type DL
 --progress: Show processing message
 
 
-The main script uses the following directory map:
-The data directory functions as the main I/O path, with filename corresponding to designated analysis or experiment tags.
 	
-   Current available PE models:
-
-    ----------On-target----------
+## Current available PE models:
+### On-target
 
         PE2		                Baseline: PE2 with conventional scaffold in HEK293T cells
 
@@ -197,11 +199,26 @@ The data directory functions as the main I/O path, with filename corresponding t
         PE4max_epegRNA_Opti_A549        PE4max combined epegRNA with optimized scaffold in A549 cells
 
 
-        ----------Off-target compatible----------
+### Off-target
         PE2_Conv		        		PE2 with conventional scaffold in HEK293T cells
 
+		
+For off-target analysis:
+Currently, only the model trained on PE2 with conventional scaffold in HEK293T cells is capable of running an additional analysis to predict off-target levels for specific pegRNAs.
 
-	working dir
+On the webtool:
+First select the Off-target compatible, PE2_Conv, and run your inputs. On the results page, use the check box indicating that you are currently running the off-target compatible analysis. Selecting individual rows will auto-fill the pegRNA IDs and the off-target sequences can be added to the text area in 74bp long formats.
+
+On the source code:
+Create two input files, offseq.txt and pegRNA.txt and run
+
+    
+    python DeepPrime.py off_run <filename>
+
+    ex)
+    python main_src.py off_run Analysis_Example
+
+# working dir
 	|---example_input
 
 	|----models
@@ -234,19 +251,5 @@ The data directory functions as the main I/O path, with filename corresponding t
 		|---dspcas9py
 		|---utils.py
 		
-		
-For off-target analysis:
-Currently, only the model trained on PE2 with conventional scaffold in HEK293T cells is capable of running an additional analysis to predict off-target levels for specific pegRNAs.
 
-On the webtool:
-First select the Off-target compatible, PE2_Conv, and run your inputs. On the results page, use the check box indicating that you are currently running the off-target compatible analysis. Selecting individual rows will auto-fill the pegRNA IDs and the off-target sequences can be added to the text area in 74bp long formats.
-
-On the source code:
-Create two input files, offseq.txt and pegRNA.txt and run
-
-    
-    python DeepPrime.py off_run <filename>
-
-    ex)
-    python main_src.py off_run Analysis_Example
 
