@@ -161,27 +161,27 @@ python DeepPrime.py -f ./example_input/dp_core_test.csv -p PE2max --cell_type DL
 	
 ## Current available PE models:
 ### On-target
-| Cell type  | PE system   | Model                     | Description                                                           |
-| ---------- | ----------- | ----------------------------- | ----------------------------------------------------------------- |
-| HEK293T    | PE2         | DeepPrime_base                | DeepPrime_base                                                    |
-| HEK293T    | NRCH_PE2    | DPFT_293T_NRCH_PE2_Opti       | DeepPrime-FT: HEK293T, NRCH-PE2 with Optimized scaffold           |
-| HEK293T    | NRCH_PE2max | DPFT_293T_NRCH-PE2max_Opti    | DeepPrime-FT: HEK293T, NRCH-PE2max with Optimized scaffold        |
-| HEK293T    | PE2         | DPFT_293T_PE2_Conv            | DeepPrime-FT: HEK293T, PE2 with Conventional scaffold             |
-| HEK293T    | PE2max-e    | DPFT_293T_PE2max_epegRNA_Opti | DeepPrime-FT: HEK293T, PE2max with Optimized scaffold and epegRNA |
-| HEK293T    | PE2max      | DPFT_293T_PE2max_Opti         | DeepPrime-FT: HEK293T, PE2max with Optimized scaffold             |
-| HEK293T    | PE4max-e    | DPFT_293T_PE4max_epegRNA_Opti | DeepPrime-FT: HEK293T, PE4max with Optimized scaffold and epegRNA |
-| HEK293T    | PE4max      | DPFT_293T_PE4max_Opti         | DeepPrime-FT: HEK293T, PE4max with Optimized scaffold             |
-| A549       | PE2max-e    | DPFT_A549_PE2max_epegRNA_Opti | DeepPrime-FT: A549, PE2max with Optimized scaffold and epegRNA    |
-| A549       | PE2max      | DPFT_A549_PE2max_Opti         | DeepPrime-FT: A549, PE2max with Optimized scaffold                |
-| A549       | PE4max-e    | DPFT_A549_PE4max_epegRNA_Opti | DeepPrime-FT: A549, PE4max with Optimized scaffold and epegRNA    |
-| A549       | PE4max      | DPFT_A549_PE4max_Opti         | DeepPrime-FT: A549, PE4max with Optimized scaffold                |
-| DLD1       | NRCH_PE4max | DPFT_DLD1_NRCHPE4max_Opti     | DeepPrime-FT: DLD1, NRCH-PE4max with Optimized scaffold           |
-| DLD1       | PE2max      | DPFT_DLD1_PE2max_Opti         | DeepPrime-FT: DLD1, PE2max with Optimized scaffold                |
-| DLD1       | PE4max      | DPFT_DLD1_PE4max_Opti         | DeepPrime-FT: DLD1, PE4max with Optimized scaffold                |
-| HCT116     | PE2         | DPFT_HCT116_PE2_Opti          | DeepPrime-FT: HCT116, PE2 with Optimized scaffold                 |
-| HeLa       | PE2max      | DPFT_HeLa_PE2max_Opti         | DeepPrime-FT: HeLa, PE2max with Optimized scaffold                |
-| MDA-MB-231 | PE2         | DPFT_MDA_PE2_Opti             | DeepPrime-FT: MDA-MB-231, PE2 with Optimized scaffold             |
-| NIH3T3     | NRCH_PE4max | DPFT_NIH_NRCHPE4max_Opti      | DeepPrime-FT: NIH3T3, NRCH-PE4max with Optimized scaffold         |
+| Cell type  | PE system   | Model                                                             |
+| ---------- | ----------- | ----------------------------------------------------------------- |
+| HEK293T    | PE2         | DeepPrime_base                                                    |
+| HEK293T    | NRCH_PE2    | DeepPrime-FT: HEK293T, NRCH-PE2 with Optimized scaffold           |
+| HEK293T    | NRCH_PE2max | DeepPrime-FT: HEK293T, NRCH-PE2max with Optimized scaffold        |
+| HEK293T    | PE2         | DeepPrime-FT: HEK293T, PE2 with Conventional scaffold             |
+| HEK293T    | PE2max-e    | DeepPrime-FT: HEK293T, PE2max with Optimized scaffold and epegRNA |
+| HEK293T    | PE2max      | DeepPrime-FT: HEK293T, PE2max with Optimized scaffold             |
+| HEK293T    | PE4max-e    | DeepPrime-FT: HEK293T, PE4max with Optimized scaffold and epegRNA |
+| HEK293T    | PE4max      | DeepPrime-FT: HEK293T, PE4max with Optimized scaffold             |
+| A549       | PE2max-e    | DeepPrime-FT: A549, PE2max with Optimized scaffold and epegRNA    |
+| A549       | PE2max      | DeepPrime-FT: A549, PE2max with Optimized scaffold                |
+| A549       | PE4max-e    | DeepPrime-FT: A549, PE4max with Optimized scaffold and epegRNA    |
+| A549       | PE4max      | DeepPrime-FT: A549, PE4max with Optimized scaffold                |
+| DLD1       | NRCH_PE4max | DeepPrime-FT: DLD1, NRCH-PE4max with Optimized scaffold           |
+| DLD1       | PE2max      | DeepPrime-FT: DLD1, PE2max with Optimized scaffold                |
+| DLD1       | PE4max      | DeepPrime-FT: DLD1, PE4max with Optimized scaffold                |
+| HCT116     | PE2         | DeepPrime-FT: HCT116, PE2 with Optimized scaffold                 |
+| HeLa       | PE2max      | DeepPrime-FT: HeLa, PE2max with Optimized scaffold                |
+| MDA-MB-231 | PE2         | DeepPrime-FT: MDA-MB-231, PE2 with Optimized scaffold             |
+| NIH3T3     | NRCH_PE4max | DeepPrime-FT: NIH3T3, NRCH-PE4max with Optimized scaffold         |
 
 ### Off-target
         PE2_Conv		        		PE2 with conventional scaffold in HEK293T cells
