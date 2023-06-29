@@ -41,6 +41,7 @@ def load_deepprime(model_id='PE2', cell_type='HEK293T', silent=True):
         
         'HEK293T': {
             'PE2'        : 'DeepPrime_base',
+            'PE2-Off'    : 'DeepPrime_off', 
             'NRCH_PE2'   : 'DP_variant_293T_NRCH_PE2_Opti_220428',
             'NRCH_PE2max': 'DP_variant_293T_NRCH-PE2max_Opti_220815',
             'PE2max'     : 'DP_variant_293T_PE2max_Opti_220428',

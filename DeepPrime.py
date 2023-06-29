@@ -85,8 +85,15 @@ def worker(list_sParameters: list):
         Ref_seq  = df_temp[1].upper()
         ED_seq   = df_temp[2].upper()
         sAlt     = df_temp[3]
-
-        result, DPStop4 = deep_prime(sample_name, sID, Ref_seq, ED_seq, sAlt, out_dir, dict_params)
+        
+        # DeepPrime-Off model
+        if dict_params['PE_system'] == 'PE-off':
+            print('\nDeepPrime-Off model is not available due to pipeline renewal')
+            print('Will be available soon. Please contact gsyu93@gmail.com if you need help.')
+            sys.exit()
+        
+        else: result, DPStop4 = deep_prime(sample_name, sID, Ref_seq, ED_seq, sAlt, out_dir, dict_params)
+        
         list_output.append(result)
         
         if progress: print('Processing: %s' % sID)
@@ -209,7 +216,7 @@ if __name__ == '__main__':
                         help="Sample name for your input (default='Sample')", default='Sample')
     
     parser.add_argument("-p", "--pe_type", type=str, 
-                        choices=['PE2', 'PE2max', 'PE2max-e', 'PE4max', 'PE4max-e', 'NRCH_PE2', 'NRCH_PE2max', 'NRCH_PE4max'], 
+                        choices=['PE2', 'PE2max', 'PE2max-e', 'PE4max', 'PE4max-e', 'NRCH_PE2', 'NRCH_PE2max', 'NRCH_PE4max', 'PE-off'], 
                         help="PE type parameter (default=PE2max)", default='PE2max')
     
     parser.add_argument("--cell_type", 
@@ -240,6 +247,25 @@ if __name__ == '__main__':
     pbs_max     = args.pbs_max
     jobs        = args.jobs
     progress    = args.progress
+
+    if pe_type == 'PE-off':
+        print(
+'''
+#####################################################################
+[Notice] DeepPrime-Off is not available at this version of pipeline.
+
+DeepPrime-Off model is not available due to pipeline renewal.
+You can use model check point file (models/DeepPrime/DeepPrime_off).
+
+The pipeline version Will be available soon.
+Please contact gsyu93@gmail.com, if you need help.
+
+Thank you.
+#####################################################################
+'''
+              )
+        
+        sys.exit()
 
     deepprime_pipeline(input_file, sample_name, pe_type, cell_type, pbs_min, pbs_max, jobs, progress)
 

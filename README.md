@@ -2,7 +2,9 @@
   
   <img src="https://github.com/hkimlab/DeepPrime/blob/main/docs/images/DeepPrime_logo.png?raw=true" width="600"/>
 
-**Developed by Hyongbum Henry Kim's lab** </br>
+**Developed by Hyongbum Henry Kim's lab** </br>  
+[![Python 3.6](https://img.shields.io/badge/python-3.6+-blue.svg)](https://www.python.org/downloads/release/python-360/)
+<a href="https://doi.org/10.1016/j.cell.2023.03.034"><img src="https://img.shields.io/badge/Published-Yu et al., Cell, 2023-blue"></a>
 
 <div align="left">
 
@@ -183,8 +185,10 @@ python DeepPrime.py -f ./example_input/dp_core_test.csv -p PE2max --cell_type DL
 | MDA-MB-231 | PE2         | DeepPrime-FT: MDA-MB-231, PE2 with Optimized scaffold             |
 | NIH3T3     | NRCH_PE4max | DeepPrime-FT: NIH3T3, NRCH-PE4max with Optimized scaffold         |
 
-### Off-target
-        PE2_Conv		        		PE2 with conventional scaffold in HEK293T cells
+### Off-target (currently writing the manual)
+| Cell type  | PE system   | Model                                                             |
+| ---------- | ----------- | ----------------------------------------------------------------- |
+| HEK293T    | PE2-off     | DeepPrime-Off: PE2 with conventional scaffold in HEK293T cells    |
 
 		
 For off-target analysis:
@@ -194,46 +198,10 @@ On the webtool:
 First select the Off-target compatible, PE2_Conv, and run your inputs. On the results page, use the check box indicating that you are currently running the off-target compatible analysis. Selecting individual rows will auto-fill the pegRNA IDs and the off-target sequences can be added to the text area in 74bp long formats.
 
 On the source code:
-Create two input files, offseq.txt and pegRNA.txt and run
+Create input file (ex: dp_off_test.csv), and run
+```
+python DeepPrime.py off_run <filename>
 
-    
-    python DeepPrime.py off_run <filename>
-
-    ex)
-    python main_src.py off_run Analysis_Example
-
-# working dir
-	|---example_input
-
-	|----models
-		|---DeepPrime
-            |---DeepPrime_base
-            |---DeepPrime_off
-            |---DP_variant_293T_NRCH_PE2_Opti_220428
-            |---DP_variant_293T_NRCH-PE2max_Opti_220815
-            |---DP_variant_293T_PE2_Conv_220428
-            |---DP_variant_293T_PE2max_epegRNA_Opti_220428
-            |---DP_variant_293T_PE2max_Opti_220428
-            |---DP_variant_293T_PE4max_epegRNA_Opti_220428
-            |---DP_variant_293T_PE4max_Opti_220728
-            |---DP_variant_A549_PE2max_epegRNA_Opti_220428
-            |---DP_variant_A549_PE2max_Opti_221114
-            |---DP_variant_A549_PE4max_epegRNA_Opti_220428
-            |---DP_variant_A549_PE4max_Opti_220728
-            |---DP_variant_DLD1_NRCHPE4max_Opti_220728
-            |---DP_variant_DLD1_PE2max_Opti_221114
-            |---DP_variant_DLD1_PE4max_Opti_220728
-            |---DP_variant_HCT116_PE2_Opti_220428
-            |---DP_variant_HeLa_PE2max_Opti_220815
-            |---DP_variant_MDA_PE2_Opti_220428
-            |---DP_variant_NIH_NRCHPE4max_Opti_220815
-		|---DeepSpCas9
-
-	|----src
-		|---biofeat.py
-		|---dprime.py
-		|---dspcas9py
-		|---utils.py
-		
-
-
+ex)
+python DeepPrime.py -f ./example_input/dp_off_test.csv -p PE2-off
+```
