@@ -1,6 +1,6 @@
 <div align="center">
   
-  <img src="https://github.com/hkimlab/DeepPrime/blob/main/docs/images/logo.png?raw=true" width="300"/>
+  <img src="https://github.com/hkimlab/DeepPrime/blob/main/docs/images/DeepPrime_logo.png?raw=true" width="600"/>
 
 **Developed by Hyongbum Henry Kim's lab** </br>
 
