@@ -9,11 +9,11 @@
 <div align="left">
 
 # Table of Contents
-- About
-- DeepPrime webtool
-- Python package for using DeepPrime: GenET
-- Installation
-- Usage
+- [About](#about)
+- [DeepPrime webtool](#deepprime-webtool)
+- [Python package for using DeepPrime: GenET](#python-package-for-using-deepprime-genet)
+- [Installation from source code](#installation-from-source-code)
+- [Usage](#usage)
 
 
 ## About:
@@ -45,7 +45,7 @@ pip install genet -f https://download.pytorch.org/whl/cu113/torch_stable.html gi
 conda install viennarna
 ```
 
-### DeepPrime usage
+### How to use DeepPrime using GenET
 ```python
 from genet import predict as prd
 
