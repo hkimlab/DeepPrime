@@ -33,13 +33,15 @@ The [webtool app](http://deepcrispr.info/DeepPrime/) can accommodate most applic
 ### Installation
 
 ```python
-# Create virtual env for genet.
-# python 3.8 was tested. 
+# Create virtual env for genet. (python 3.8 was tested)
 conda create -n genet python=3.8
 conda activate genet
 
-# install genet package in your env.
-pip install genet -f https://download.pytorch.org/whl/cu113/torch_stable.html git+https://github.com/Goosang-Yu/genet-models.git
+# Install genet ( >= ver. 0.7.3)
+pip install genet
+
+# CUDA 11.3 (For Linux and Windows)
+pip install torch==1.11.0+cu113 --extra-index-url https://download.pytorch.org/whl/cu113
 
 # install ViennaRNA package for prediction module
 conda install viennarna
