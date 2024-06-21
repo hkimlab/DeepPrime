@@ -33,43 +33,35 @@ The [webtool app](http://deepcrispr.info/DeepPrime/) can accommodate most applic
 ### Installation
 
 ```python
-# Create virtual env for genet. (python 3.8 was tested)
-conda create -n genet python=3.8
+# Create virtual env for genet.
+conda create -n genet python=3.10
 conda activate genet
 
-# Install genet ( >= ver. 0.7.3)
+# Install genet
 pip install genet
-
-# CUDA 11.3 (For Linux and Windows)
-pip install torch==1.11.0+cu113 --extra-index-url https://download.pytorch.org/whl/cu113
-
-# install ViennaRNA package for prediction module
-conda install viennarna
 ```
 
 ### How to use DeepPrime using GenET
 ```python
-from genet import predict as prd
+from genet.predict import DeepPrime
 
-# Place WT sequence and Edited sequence information, respectively.
-# And select the edit type you want to make and put it in.
-#Input seq: 60bp 5' context + 1bp center + 60bp 3' context (total 121bp)
+seq = 'CCGAGTTGGTTCATCATCATTCAACGGTGGCCGACGGGCTCATCACCACGCTCCATTATC(C/T)AGCCCCAAAGCGCAACAAGCCCACTGTCTATGGTGTGTCCCCCAACTACGACAAGTGGGA'
 
-seq_wt   = 'ATGACAATAAAAGACAACACCCTTGCCTTGTGGAGTTTTCAAAGCTCCCAGAAACTGAGAAGAACTATAACCTGCAAATGTCAACTGAAACCTTAAAGTGAGTATTTAATTGAGCTGAAGT'
-seq_ed   = 'ATGACAATAAAAGACAACACCCTTGCCTTGTGGAGTTTTCAAAGCTCCCAGAAACTGAGACGAACTATAACCTGCAAATGTCAACTGAAACCTTAAAGTGAGTATTTAATTGAGCTGAAGT'
-alt_type = 'sub1'
+pegrna = DeepPrime(seq)
 
-df_pe = prd.pe_score(seq_wt, seq_ed, alt_type)
-df_pe.head()
+# check designed pegRNAs
+pegrna.features.head()
 ```
 output:
-|    | ID     | WT74_On                                                                    | Edited74_On                                                                |   PBSlen |   RTlen |   RT-PBSlen |   Edit_pos |   Edit_len |   RHA_len |   type_sub |   type_ins |   type_del |     Tm1 |     Tm2 |   Tm2new |      Tm3 |     Tm4 |      TmD |   nGCcnt1 |   nGCcnt2 |   nGCcnt3 |   fGCcont1 |   fGCcont2 |   fGCcont3 |   MFE3 |   MFE4 |   DeepSpCas9_score |   PE2max_score |
-|---:|:-------|:---------------------------------------------------------------------------|:---------------------------------------------------------------------------|---------:|--------:|------------:|-----------:|-----------:|----------:|-----------:|-----------:|-----------:|--------:|--------:|---------:|---------:|--------:|---------:|----------:|----------:|----------:|-----------:|-----------:|-----------:|-------:|-------:|-------------------:|------------------:|
-|  0 | Sample | ATAAAAGACAACACCCTTGCCTTGTGGAGTTTTCAAAGCTCCCAGAAACTGAGAAGAACTATAACCTGCAAATG | xxxxxxxxxxxxxxCCTTGCCTTGTGGAGTTTTCAAAGCTCCCAGAAACTGAGACGxxxxxxxxxxxxxxxxxx |        7 |      35 |          42 |         34 |          1 |         1 |          1 |          0 |          0 | 16.191  | 62.1654 |  62.1654 | -277.939 | 58.2253 | -340.105 |         5 |        16 |        21 |    71.4286 |    45.7143 |    50      |  -10.4 |   -0.6 |            45.9675 |         0.0202249 |
-|  1 | Sample | ATAAAAGACAACACCCTTGCCTTGTGGAGTTTTCAAAGCTCCCAGAAACTGAGAAGAACTATAACCTGCAAATG | xxxxxxxxxxxxxCCCTTGCCTTGTGGAGTTTTCAAAGCTCCCAGAAACTGAGACGxxxxxxxxxxxxxxxxxx |        8 |      35 |          43 |         34 |          1 |         1 |          1 |          0 |          0 | 30.1995 | 62.1654 |  62.1654 | -277.939 | 58.2253 | -340.105 |         6 |        16 |        22 |    75      |    45.7143 |    51.1628 |  -10.4 |   -0.6 |            45.9675 |         0.0541608 |
-|  2 | Sample | ATAAAAGACAACACCCTTGCCTTGTGGAGTTTTCAAAGCTCCCAGAAACTGAGAAGAACTATAACCTGCAAATG | xxxxxxxxxxxxACCCTTGCCTTGTGGAGTTTTCAAAGCTCCCAGAAACTGAGACGxxxxxxxxxxxxxxxxxx |        9 |      35 |          44 |         34 |          1 |         1 |          1 |          0 |          0 | 33.7839 | 62.1654 |  62.1654 | -277.939 | 58.2253 | -340.105 |         6 |        16 |        22 |    66.6667 |    45.7143 |    50      |  -10.4 |   -0.6 |            45.9675 |         0.051455  |
-|  3 | Sample | ATAAAAGACAACACCCTTGCCTTGTGGAGTTTTCAAAGCTCCCAGAAACTGAGAAGAACTATAACCTGCAAATG | xxxxxxxxxxxCACCCTTGCCTTGTGGAGTTTTCAAAGCTCCCAGAAACTGAGACGxxxxxxxxxxxxxxxxxx |       10 |      35 |          45 |         34 |          1 |         1 |          1 |          0 |          0 | 38.5141 | 62.1654 |  62.1654 | -277.939 | 58.2253 | -340.105 |         7 |        16 |        23 |    70      |    45.7143 |    51.1111 |  -10.4 |   -0.6 |            45.9675 |         0.0826205 |
-|  4 | Sample | ATAAAAGACAACACCCTTGCCTTGTGGAGTTTTCAAAGCTCCCAGAAACTGAGAAGAACTATAACCTGCAAATG | xxxxxxxxxxACACCCTTGCCTTGTGGAGTTTTCAAAGCTCCCAGAAACTGAGACGxxxxxxxxxxxxxxxxxx |       11 |      35 |          46 |         34 |          1 |         1 |          1 |          0 |          0 | 40.8741 | 62.1654 |  62.1654 | -277.939 | 58.2253 | -340.105 |         7 |        16 |        23 |    63.6364 |    45.7143 |    50      |  -10.4 |   -0.6 |            45.9675 |         0.0910506 |
+
+|   | ID         | Spacer               | RT-PBS                                            | PBS_len | RTT_len | RT-PBS_len | Edit_pos | Edit_len | RHA_len | Target                                            | ... | deltaTm_Tm4-Tm2 | GC_count_PBS | GC_count_RTT | GC_count_RT-PBS | GC_contents_PBS | GC_contents_RTT | GC_contents_RT-PBS | MFE_RT-PBS-polyT | MFE_Spacer | DeepSpCas9_score |
+| - | ---------- | -------------------- | ------------------------------------------------- | ------- | ------- | ---------- | -------- | -------- | ------- | ------------------------------------------------- | --- | --------------- | ------------ | ------------ | --------------- | --------------- | --------------- | ------------------ | ---------------- | ---------- | ---------------- |
+| 0 | SampleName | GGTTCATCATCATTCAACGG | TAGATAATGGAGCGTGGTGATGAGCCCGTCGGCCACCGTTGAATG     | 7       | 38      | 45         | 37       | 1        | 1       | AGTTGGTTCATCATCATTCAACGGTGGCCGACGGGCTCATCACCAC... | ... | \-510.285       | 2            | 23           | 25              | 28.57143        | 60.52632        | 55.55556           | \-12.7           | 0          | 76.43662         |
+| 1 | SampleName | GGTTCATCATCATTCAACGG | TAGATAATGGAGCGTGGTGATGAGCCCGTCGGCCACCGTTGAATGA    | 8       | 38      | 46         | 37       | 1        | 1       | AGTTGGTTCATCATCATTCAACGGTGGCCGACGGGCTCATCACCAC... | ... | \-510.285       | 2            | 23           | 25              | 25              | 60.52632        | 54.34783           | \-11.4           | 0          | 76.43662         |
+| 2 | SampleName | GGTTCATCATCATTCAACGG | TAGATAATGGAGCGTGGTGATGAGCCCGTCGGCCACCGTTGAATGAT   | 9       | 38      | 47         | 37       | 1        | 1       | AGTTGGTTCATCATCATTCAACGGTGGCCGACGGGCTCATCACCAC... | ... | \-510.285       | 2            | 23           | 25              | 22.22222        | 60.52632        | 53.19149           | \-11.4           | 0          | 76.43662         |
+| 3 | SampleName | GGTTCATCATCATTCAACGG | TAGATAATGGAGCGTGGTGATGAGCCCGTCGGCCACCGTTGAATGATG  | 10      | 38      | 48         | 37       | 1        | 1       | AGTTGGTTCATCATCATTCAACGGTGGCCGACGGGCTCATCACCAC... | ... | \-510.285       | 3            | 23           | 26              | 30              | 60.52632        | 54.16667           | \-11.2           | 0          | 76.43662         |
+| 4 | SampleName | GGTTCATCATCATTCAACGG | TAGATAATGGAGCGTGGTGATGAGCCCGTCGGCCACCGTTGAATGATGA | 11      | 38      | 49         | 37       | 1        | 1       | AGTTGGTTCATCATCATTCAACGGTGGCCGACGGGCTCATCACCAC... | ... | \-510.285       | 3            | 23           | 26              | 27.27273        | 60.52632        | 53.06122           | \-11.2           | 0          | 76.43662         |
+
 
   
 
