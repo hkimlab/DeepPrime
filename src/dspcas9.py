@@ -143,7 +143,7 @@ def calculate_DeepSpCas9_score(sBase_DIR, list_target30):
     args = [filter_size, filter_num, l_rate, load_episode]
     tf.compat.v1.reset_default_graph()
     with tf.compat.v1.Session(config=conf) as sess:
-        sess.run(tf.comapt.v1.global_variables_initializer())
+        sess.run(tf.compat.v1.global_variables_initializer())
         model = Deep_SpCas9(filter_size, filter_num, node_1, node_2, args[2])
 
         saver = tf.compat.v1.train.Saver()
